@@ -2,7 +2,7 @@
 
 namespace BankOCR.Common
 {
-    public class StringConverter
+    public class AccountNumberConverter
     {
         public List<string> Converted = new List<string>();
         private readonly Dictionary<string, char> NumberEquivalents = new Dictionary<string, char>()
@@ -19,7 +19,7 @@ namespace BankOCR.Common
             { " _ " + "|_|" + " _|", '9' }
         };
 
-        public StringConverter(string input)
+        public AccountNumberConverter(string input)
         {
             Convert(input);
         }

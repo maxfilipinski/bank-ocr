@@ -71,7 +71,7 @@ namespace BankOcrKata
             };
 
             // Act
-            StringConverter converter = new StringConverter(input);
+            AccountNumberConverter converter = new AccountNumberConverter(input);
 
             // Assert
             Assert.AreEqual(expected, converter.Converted);

@@ -1,9 +1,10 @@
-﻿using NUnit.Framework;
+﻿using BankOCR.Common;
+using NUnit.Framework;
 
 namespace BankOcrKata
 {
     [TestFixture]
-    public class UserStory2
+    public class UserStory2Tests
     {
         [TestCase("711111111", true)]
         [TestCase("123456789", true)]
@@ -13,6 +14,13 @@ namespace BankOcrKata
         [TestCase("012345678", false)]
         public void Tests(string accountNumber, bool isValid)
         {
+            // Arrange
+
+            // Act
+            AccountNumberValidator validator = new AccountNumberValidator(accountNumber);
+
+            // Assert
+            Assert.AreEqual(isValid, validator.IsAccountValid);
         }
     }
 }
