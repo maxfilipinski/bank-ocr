@@ -80,7 +80,7 @@ namespace BankOCR.Common
             
             for (int i = 0; i < numbersArray.Length; i++)
             {
-                result += NumberEquivalents[numbersArray[i]];
+                result += NumberEquivalents.ContainsKey(numbersArray[i]) ? NumberEquivalents[numbersArray[i]] : '?';
             }
 
             Converted.Add(result);
