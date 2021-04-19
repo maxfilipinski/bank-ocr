@@ -21,37 +21,12 @@ namespace BankOcrKata
         public void Tests(string input, string expectedResult)
         {
             // Arrange
-            List<string> expected = new List<string>()
-            {
-                expectedResult
-            };
 
             // Act
-            AccountNumberConverter converter = new AccountNumberConverter(input);
             AccountNumberValidator validator = new AccountNumberValidator();
-            List<string> actualAccountNumbers = new List<string>();
-
-            foreach (var item in converter.Converted)
-            {
-                string accountNumber = item;
-
-                if (validator.CheckIsAccountNumeric(accountNumber))
-                {
-                    if (!validator.ValidateChecksum(accountNumber))
-                    {
-                        accountNumber = validator.MarkAccountNumberAsInvalid(accountNumber);
-                    }
-                }
-                else
-                {
-                    accountNumber = validator.MarkAccountNumberAsIllegible(accountNumber);
-                }
-
-                actualAccountNumbers.Add(accountNumber);
-            }
 
             // Assert
-            Assert.AreEqual(expected, actualAccountNumbers);
+            Assert.AreEqual(expectedResult, validator.ValidateAccountNumber(input));
         }
     }
 }

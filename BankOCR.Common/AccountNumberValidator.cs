@@ -1,14 +1,44 @@
 ﻿namespace BankOCR.Common
 {
-    public class AccountNumberValidator
+    public interface IValidator
     {
-        public bool IsAccountValid;
+        public string ValidateAccountNumber(string input);
+        public bool CheckIsValid(string input);
+        public bool CheckIsAccountNumeric(string input);
+        public bool ValidateChecksum(string input);
+    }
 
-        public AccountNumberValidator() { }
+    public class AccountNumberValidator : IValidator
+    {
+        private readonly IConverter _converter;
 
-        public AccountNumberValidator(string accountNumber)
+        public AccountNumberValidator() 
         {
-            IsAccountValid = ValidateChecksum(accountNumber);
+            _converter = new AccountNumberConverter();
+        }
+
+        public string ValidateAccountNumber(string input)
+        {
+            string accountNumber = _converter.Convert(input);
+
+            if (CheckIsAccountNumeric(accountNumber))
+            {
+                if (ValidateChecksum(accountNumber))
+                {
+                    return accountNumber;
+                }
+
+                return MarkAccountNumberAsInvalid(accountNumber);
+            }
+            else
+            {
+                return MarkAccountNumberAsIllegible(accountNumber);
+            }
+        }
+
+        public bool CheckIsValid(string input)
+        {
+            return ValidateChecksum(input);
         }
 
         public bool ValidateChecksum(string accountNumber)
@@ -28,12 +58,12 @@
             return int.TryParse(accountNumber, out _);
         }
 
-        public string MarkAccountNumberAsIllegible(string accountNumber)
+        private string MarkAccountNumberAsIllegible(string accountNumber)
         {
             return $"{accountNumber} ILL";
         }
 
-        public string MarkAccountNumberAsInvalid(string accountNumber)
+        private string MarkAccountNumberAsInvalid(string accountNumber)
         {
             return $"{accountNumber} ERR";
         }

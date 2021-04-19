@@ -54,16 +54,12 @@ namespace BankOcrKata
         public void Tests(string input, string expectedResult)
         {
             // Arrange
-            List<string> expected = new List<string>()
-            {
-                expectedResult
-            };
 
             // Act
-            AccountNumberConverter converter = new AccountNumberConverter(input);
+            AccountNumberConverter converter = new AccountNumberConverter();
 
             // Assert
-            Assert.AreEqual(expected, converter.Converted);
+            Assert.AreEqual(expectedResult, converter.Convert(input));
         }
     }
 }

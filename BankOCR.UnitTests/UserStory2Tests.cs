@@ -12,15 +12,15 @@ namespace BankOcrKata
         [TestCase("888888888", false)]
         [TestCase("490067715", false)]
         [TestCase("012345678", false)]
-        public void Tests(string accountNumber, bool isValid)
+        public void Tests(string input, bool isValid)
         {
             // Arrange
 
             // Act
-            AccountNumberValidator validator = new AccountNumberValidator(accountNumber);
+            AccountNumberValidator validator = new AccountNumberValidator();
 
             // Assert
-            Assert.AreEqual(isValid, validator.IsAccountValid);
+            Assert.AreEqual(isValid, validator.CheckIsValid(input));
         }
     }
 }

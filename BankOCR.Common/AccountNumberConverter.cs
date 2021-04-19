@@ -2,9 +2,15 @@
 
 namespace BankOCR.Common
 {
-    public class AccountNumberConverter
+    public interface IConverter
+    {
+        public string Convert(string input);
+    }
+
+    public class AccountNumberConverter : IConverter
     {
         public List<string> Converted = new List<string>();
+        public string[] SeparateNumbersArray = new string[9];
         private readonly Dictionary<string, char> NumberEquivalents = new Dictionary<string, char>()
         {
             { " _ " + "| |" + "|_|", '0' },
@@ -19,12 +25,12 @@ namespace BankOCR.Common
             { " _ " + "|_|" + " _|", '9' }
         };
 
-        public AccountNumberConverter(string input)
+        public AccountNumberConverter()
         {
-            Convert(input);
+            
         }
 
-        private void Convert(string input)
+        public string Convert(string input)
         {
             // imitate File.ReadAllLines => returns string[]
             string[] entryLinesFromFile = new string[]
@@ -37,6 +43,7 @@ namespace BankOCR.Common
 
             int index = -1;
             List<List<string>> entryLinesToConvert = new List<List<string>>();
+            string result = "";
 
             for (int i = 0; i < entryLinesFromFile.Length; i += 4)
             {
@@ -51,11 +58,13 @@ namespace BankOCR.Common
 
             for (int i = 0; i < entryLinesToConvert.Count; i++)
             {
-                ConvertEntryLinesToSeparateNumbersArray(entryLinesToConvert[i].ToArray());
+                result = ConvertEntryLinesToSeparateNumbersArray(entryLinesToConvert[i].ToArray());
             }
+
+            return result;
         }
 
-        private void ConvertEntryLinesToSeparateNumbersArray(string[] entryLinesArray)
+        private string ConvertEntryLinesToSeparateNumbersArray(string[] entryLinesArray)
         {
             int nextNumberStartPosition = 0;
             string[] separateNumbersArray = new string[9];
@@ -71,10 +80,12 @@ namespace BankOCR.Common
                 separateNumbersArray[i] += entryLinesArray[2].Substring(nextNumberStartPosition, 3);
             }
 
-            ConvertNumbersArrayToNumber(separateNumbersArray);
+            SeparateNumbersArray = separateNumbersArray;
+
+            return ConvertNumbersArrayToNumber(separateNumbersArray);
         }
 
-        private void ConvertNumbersArrayToNumber(string[] numbersArray)
+        private string ConvertNumbersArrayToNumber(string[] numbersArray)
         {
             string result = "";
             
@@ -83,7 +94,7 @@ namespace BankOCR.Common
                 result += NumberEquivalents.ContainsKey(numbersArray[i]) ? NumberEquivalents[numbersArray[i]] : '?';
             }
 
-            Converted.Add(result);
+            return result;
         }
     }
 }
