@@ -1,13 +1,5 @@
 ﻿namespace BankOCR.Common
 {
-    public interface IValidator
-    {
-        public string ValidateAccountNumber(string input);
-        public bool CheckIsValid(string input);
-        public bool CheckIsAccountNumeric(string input);
-        public bool ValidateChecksum(string input);
-    }
-
     public class AccountNumberValidator : IValidator
     {
         private readonly IConverter _converter;
@@ -36,9 +28,9 @@
             }
         }
 
-        public bool CheckIsValid(string input)
+        public bool CheckIsAccountNumberValid(string accountNumber)
         {
-            return ValidateChecksum(input);
+            return ValidateChecksum(accountNumber);
         }
 
         public bool ValidateChecksum(string accountNumber)

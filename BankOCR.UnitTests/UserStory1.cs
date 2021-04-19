@@ -1,11 +1,10 @@
 ﻿using BankOCR.Common;
 using NUnit.Framework;
-using System.Collections.Generic;
 
 namespace BankOcrKata
 {
     [TestFixture]
-    public class UserStory1Tests
+    public class UserStory1
     {
         [TestCase(@"
  _  _  _  _  _  _  _  _  _ 
@@ -56,7 +55,7 @@ namespace BankOcrKata
             // Arrange
 
             // Act
-            AccountNumberConverter converter = new AccountNumberConverter();
+            IConverter converter = new AccountNumberConverter();
 
             // Assert
             Assert.AreEqual(expectedResult, converter.Convert(input));

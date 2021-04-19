@@ -2,16 +2,11 @@
 
 namespace BankOCR.Common
 {
-    public interface IConverter
-    {
-        public string Convert(string input);
-    }
-
     public class AccountNumberConverter : IConverter
     {
-        public List<string> Converted = new List<string>();
-        public string[] SeparateNumbersArray = new string[9];
-        private readonly Dictionary<string, char> NumberEquivalents = new Dictionary<string, char>()
+        public char IllegibleDigit => '?';
+
+        public readonly Dictionary<string, char> NumberEquivalents = new Dictionary<string, char>()
         {
             { " _ " + "| |" + "|_|", '0' },
             { "   " + "  |" + "  |", '1' },
@@ -25,14 +20,8 @@ namespace BankOCR.Common
             { " _ " + "|_|" + " _|", '9' }
         };
 
-        public AccountNumberConverter()
-        {
-            
-        }
-
         public string Convert(string input)
         {
-            // imitate File.ReadAllLines => returns string[]
             string[] entryLinesFromFile = new string[]
             {
                 string.Join("", input.Split('\n', '\r')).Substring(0, 27),
@@ -42,8 +31,8 @@ namespace BankOCR.Common
             };
 
             int index = -1;
-            List<List<string>> entryLinesToConvert = new List<List<string>>();
             string result = "";
+            List<List<string>> entryLinesToConvert = new List<List<string>>();
 
             for (int i = 0; i < entryLinesFromFile.Length; i += 4)
             {
@@ -80,8 +69,6 @@ namespace BankOCR.Common
                 separateNumbersArray[i] += entryLinesArray[2].Substring(nextNumberStartPosition, 3);
             }
 
-            SeparateNumbersArray = separateNumbersArray;
-
             return ConvertNumbersArrayToNumber(separateNumbersArray);
         }
 
@@ -91,7 +78,7 @@ namespace BankOCR.Common
             
             for (int i = 0; i < numbersArray.Length; i++)
             {
-                result += NumberEquivalents.ContainsKey(numbersArray[i]) ? NumberEquivalents[numbersArray[i]] : '?';
+                result += NumberEquivalents.ContainsKey(numbersArray[i]) ? NumberEquivalents[numbersArray[i]] : IllegibleDigit;
             }
 
             return result;

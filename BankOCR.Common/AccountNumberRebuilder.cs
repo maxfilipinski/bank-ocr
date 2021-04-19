@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace BankOCR.Common
 {
-    public class AccountNumberRebuilder
+    public class AccountNumberRebuilder : IRebuilder
     {
         private readonly IConverter _converter;
         private readonly IValidator _validator;
@@ -41,28 +40,29 @@ namespace BankOCR.Common
 
             return _validator.CheckIsAccountNumeric(accountNumber) 
                 ? TryRebuildInvalidAccountNumber(accountNumber) 
-                : TryRebuildIllAccountNumber(accountNumber);
+                : TryRebuildIllegibleAccountNumber(accountNumber);
         }
         
-        private string TryRebuildIllAccountNumber(string illAccountNumber)
+        private string TryRebuildIllegibleAccountNumber(string illegibleAccountNumber)
         {
-            var accountNumberSubstitutions = new List<string>();
-            int illDigitIndex = illAccountNumber.IndexOf('?');
-            List<char> accountNumber = illAccountNumber.ToCharArray().ToList();
-            var illDigit = accountNumber[illDigitIndex];
+            List<string> accountNumberSubstitutions = new List<string>();
+            int illDigitIndex = illegibleAccountNumber.IndexOf('?');
+            List<char> accountNumber = illegibleAccountNumber.ToCharArray().ToList();
             var digitSubstitutes = NumberEquivalents.Select(x => x.Value).ToList();
 
             foreach (var digitSubstitute in digitSubstitutes)
             {
                 accountNumber[illDigitIndex] = digitSubstitute;
 
-                if (_validator.ValidateChecksum(string.Join(string.Empty, accountNumber)))
+                string accountNumberString = string.Join(string.Empty, accountNumber);
+
+                if (_validator.ValidateChecksum(accountNumberString))
                 {
-                    accountNumberSubstitutions.Add(string.Join(string.Empty, accountNumber));
+                    accountNumberSubstitutions.Add(accountNumberString);
                 }
             }
 
-            if (accountNumberSubstitutions.Count != 1)
+            if (!accountNumberSubstitutions.Count.Equals(1))
             {
                 throw new Exception("Error in rebuilding ill account number!");
             }
@@ -72,21 +72,22 @@ namespace BankOCR.Common
 
         private string TryRebuildInvalidAccountNumber(string invalidAccountNumber)
         {
-            var accountNumberSubstitutions = new List<string>();
+            List<string> accountNumberSubstitutions = new List<string>();
             List<char> accountNumber = invalidAccountNumber.ToCharArray().ToList();
 
             for (int i = 0; i < accountNumber.Count; i++)
             {
-                var digitToReplace = accountNumber[i];
+                char digitToReplace = accountNumber[i];
                 var digitSubstitutes = GetSimilarDigits(digitToReplace);
 
                 foreach (var digitSubstitute in digitSubstitutes)
                 {
                     accountNumber[i] = digitSubstitute;
+                    string accountNumberString = string.Join(string.Empty, accountNumber);
 
-                    if (_validator.ValidateChecksum(string.Join(string.Empty, accountNumber)))
+                    if (_validator.ValidateChecksum(accountNumberString))
                     {
-                        accountNumberSubstitutions.Add(string.Join(string.Empty, accountNumber));
+                        accountNumberSubstitutions.Add(accountNumberString);
                     }
 
                     accountNumber[i] = digitToReplace;
@@ -100,33 +101,39 @@ namespace BankOCR.Common
                 case 1:
                     return string.Join(string.Empty, accountNumberSubstitutions.First());
                 default:
-                    return $"{invalidAccountNumber} AMB ['{string.Join("', '", accountNumberSubstitutions.OrderBy(str => str))}']";
+                    return $"{invalidAccountNumber} AMB ['{string.Join("', '", accountNumberSubstitutions.OrderBy(s => s))}']";
             }
         }
 
         private IEnumerable<char> GetSimilarDigits(char digit)
         {
-            var initialDigit = NumberEquivalents.Where(x => x.Value == digit).FirstOrDefault();
+            var rootDigit = NumberEquivalents.Where(x => x.Value == digit).FirstOrDefault();
 
             foreach (var item in NumberEquivalents)
             {
-                if (GetHammingDistance(initialDigit.Key, item.Key).Equals(1))
+                if (GetHammingDistance(rootDigit.Key, item.Key).Equals(1))
                 {
                     yield return item.Value;
                 }
             }
         }
 
-        private int GetHammingDistance(string comparable, string compared)
+        /// <summary>
+        /// Returns number of positions at which the corresponding strings are different.
+        /// </summary>
+        /// <param name="string1"></param>
+        /// <param name="string2"></param>
+        /// <returns></returns>
+        private int GetHammingDistance(string string1, string string2)
         {
-            if (comparable.Length != compared.Length)
+            if (string1.Length != string2.Length)
             {
                 throw new Exception("Strings must be equal length!");
             }
 
-            int distance = comparable
+            int distance = string1
                 .ToCharArray()
-                .Zip(compared.ToCharArray(), (c1, c2) => new { c1, c2 })
+                .Zip(string2.ToCharArray(), (c1, c2) => new { c1, c2 })
                 .Count(m => m.c1 != m.c2);
 
             return distance;

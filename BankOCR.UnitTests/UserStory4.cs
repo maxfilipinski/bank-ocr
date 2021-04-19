@@ -1,12 +1,9 @@
 ﻿using BankOCR.Common;
 using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace BankOcrKata
 {
-    public class UserStory4Tests
+    public class UserStory4
     {
         [TestCase(@"
                            
@@ -61,7 +58,7 @@ namespace BankOcrKata
             // Arrange
 
             // Act
-            AccountNumberRebuilder rebuilder = new AccountNumberRebuilder();
+            IRebuilder rebuilder = new AccountNumberRebuilder();
 
             // Assert
             Assert.AreEqual(expectedResult, rebuilder.ValidateAndTryRebuildAccountNumber(input));

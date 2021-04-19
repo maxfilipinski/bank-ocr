@@ -1,10 +1,9 @@
 ﻿using BankOCR.Common;
 using NUnit.Framework;
-using System.Collections.Generic;
 
 namespace BankOcrKata
 {
-    public class UserStory3Tests
+    public class UserStory3
     {
         [TestCase(@"
  _  _  _  _  _  _  _  _    
@@ -23,7 +22,7 @@ namespace BankOcrKata
             // Arrange
 
             // Act
-            AccountNumberValidator validator = new AccountNumberValidator();
+            IValidator validator = new AccountNumberValidator();
 
             // Assert
             Assert.AreEqual(expectedResult, validator.ValidateAccountNumber(input));

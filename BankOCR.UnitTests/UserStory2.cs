@@ -4,7 +4,7 @@ using NUnit.Framework;
 namespace BankOcrKata
 {
     [TestFixture]
-    public class UserStory2Tests
+    public class UserStory2
     {
         [TestCase("711111111", true)]
         [TestCase("123456789", true)]
@@ -12,15 +12,15 @@ namespace BankOcrKata
         [TestCase("888888888", false)]
         [TestCase("490067715", false)]
         [TestCase("012345678", false)]
-        public void Tests(string input, bool isValid)
+        public void Tests(string accountNumber, bool isValid)
         {
             // Arrange
 
             // Act
-            AccountNumberValidator validator = new AccountNumberValidator();
+            IValidator validator = new AccountNumberValidator();
 
             // Assert
-            Assert.AreEqual(isValid, validator.CheckIsValid(input));
+            Assert.AreEqual(isValid, validator.CheckIsAccountNumberValid(accountNumber));
         }
     }
 }
